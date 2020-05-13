@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#6200EE</color>
+    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorAccent">#03DAC5</color>
+
+    <color name="bottomNavSelected">#2ad1d1</color>
+
+    <color name="home_toolbar">#2ee8e8</color>
+
+    <color name="stats_tabLayout">#23fafa</color>
+
+    <color name="saveButton_background">#47d1a1</color>
+    <color name="warningColor">#f0654f</color>
+
+    <color name="happy">#ed6258</color>
+    <color name="productive">#40c98a</color>
+    <color name="sad">#4764f5</color>
+    <color name="boring">#944a1c</color>
+    <color name="tired">#838a86</color>
+    <color name="stressed">#9866de</color>
+    <color name="fantastic">#dcde52</color>
+</resources>

@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Mood Tracker</string>
+    <string name="home_toolbar_text">Mood Tracker</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="current_date_text">XX/XX/XXXX</string>
+    <string name="save_button">Track</string>
+    <string name="directions_text">Please select a mood and write a brief desription</string>
+    <string name="radioButton_happy_text">Happy</string>
+    <string name="radioButton_productive_text">Productive</string>
+    <string name="radioButton_sad_text">Sad</string>
+    <string name="radioButton_boring_text">Boring</string>
+    <string name="radioButton_tired_text">Tired</string>
+    <string name="radioButton_stressed_text">Stressed</string>
+    <string name="radioButton_fantastic_text">FANTASTIC</string>
+    <string name="explanation_text">Explain...</string>
+    <string name="retrack_text">You have already tracked for today. Another track will overwrite today</string>
+    <string name="basic_direction_text">A basic overview of all moods you have experienced</string>
+    <string name="happy_count">Happy count:</string>
+    <string name="productive_count">Productive count:</string>
+    <string name="sad_count">Sad count:</string>
+    <string name="boring_count">Boring count:</string>
+    <string name="tired_count">Tired count:</string>
+    <string name="stressed_count">Stressed count:</string>
+    <string name="fantastic_count">Fantastic count:</string>
+    <string name="clear_option_text">Clear All Moods</string>
+    <string name="date_title">XX/XXXX</string>
+    <string name="back_arrow_description">Back Arrow</string>
+    <string name="forward_arrow_description">Forward Arrow</string>
+    <string name="clear_mood_button_text">Clear This Mood</string>
+</resources>
