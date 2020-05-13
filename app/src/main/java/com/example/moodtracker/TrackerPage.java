@@ -1,5 +1,6 @@
 package com.example.moodtracker;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.icu.text.DateFormat;
@@ -7,6 +8,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,9 +46,9 @@ public class TrackerPage extends Fragment {
         Date d = new Date();
         SimpleDateFormat date = new SimpleDateFormat("MM:dd:yyyy");
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
-        if(sharedPreferences.getStringSet(EXPLAIN_KEY, null) != null) {
+        if(sharedPreferences.getStringSet(MOOD_KEY, null) != null) {
             String setDate;
-            for(String text : sharedPreferences.getStringSet(EXPLAIN_KEY, null)) {
+            for(String text : sharedPreferences.getStringSet(MOOD_KEY, null)) {
                 setDate = "";
                 for(int i = 0; i < text.length(); i++) {
                     if(text.charAt(i) == '|') {
@@ -91,11 +93,19 @@ public class TrackerPage extends Fragment {
         mSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                SharedPreferences sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+
                 if(mMoodOption.getCheckedRadioButtonId() == -1) {
                     Toast.makeText(getContext(), "Please Select A Mood", Toast.LENGTH_SHORT).show();
+                    Set<String> set = sharedPreferences.getStringSet(MOOD_KEY, null);
+                    if(set != null) {
+                        for(String text : set) {
+                            Log.d("days", text);
+                        }
+                    }
                     return;
                 }
-                SharedPreferences sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 // = Here we edit the explain text so it can be accessed later through the date.
                 Date d = new Date();
@@ -125,6 +135,7 @@ public class TrackerPage extends Fragment {
                     }
                     moodSet.add(moodText);
                 }
+                editor.remove(MOOD_KEY);
                 editor.putStringSet(MOOD_KEY, moodSet);
                 editor.apply();
 
@@ -132,6 +143,7 @@ public class TrackerPage extends Fragment {
                 if(sharedPreferences.getStringSet(EXPLAIN_KEY,null) == null) {
                     Set<String> explainSet = new HashSet<String>();
                     explainSet.add(explainText);
+                    editor.remove(EXPLAIN_KEY);
                     editor.putStringSet(EXPLAIN_KEY, explainSet);
                     editor.apply();
                 } else {
@@ -162,6 +174,7 @@ public class TrackerPage extends Fragment {
                             }
                         }
                         explainSet.add(explainText);
+                        editor.remove(EXPLAIN_KEY);
                         editor.putStringSet(EXPLAIN_KEY, explainSet);
                         editor.apply();
                     }
@@ -173,3 +186,4 @@ public class TrackerPage extends Fragment {
         return view;
     }
 }
+
