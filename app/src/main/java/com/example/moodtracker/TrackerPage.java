@@ -1,11 +1,13 @@
 package com.example.moodtracker;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -180,3 +182,4 @@ public class TrackerPage extends Fragment {
         return view;
     }
 }
+
