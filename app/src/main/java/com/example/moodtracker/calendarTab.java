@@ -24,6 +24,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Hashtable;
 
 
 /**
@@ -39,6 +41,7 @@ public class calendarTab extends Fragment {
     private int monthOffSet = 0;
     private int yearOffSet = 0;
     private String currentText;
+    private HashMap<String, String> currentMap;
 
     private String DAY_INTENT = "dayIntent";
     private String SHARED_PREFS = "SharedPrefs";
@@ -60,6 +63,7 @@ public class calendarTab extends Fragment {
         forwardArrow = view.findViewById(R.id.fowardArrow);
         calendarView.setColumnCount(7);
         calendarView.setRowCount(5);
+        currentMap = new HashMap<String, String>();
 
 
         backArrow.setOnClickListener(new View.OnClickListener() {
@@ -178,17 +182,20 @@ public class calendarTab extends Fragment {
         for(int i = 0; i < length; i++) {
             days.add(new TextView(getContext()));
             final String dayNum = "" + (i+1);
+            days.get(i).setId(i);
             days.get(i).setText(dayNum);
             days.get(i).setPadding(42, 55, 42, 75);
             int color = setColor(Integer.parseInt(dayNum));
+            currentMap.put(String.valueOf(days.get(i).getId()), currentText);
             if(color != android.R.color.transparent) {
                 days.get(i).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(getContext(), selectedDate.class);
-                        intent.putExtra(DAY_INTENT, currentText);
+                        int id = v.getId();
+                        String text = currentMap.get(String.valueOf(id));
+                        intent.putExtra(DAY_INTENT, text);
                         startActivity(intent);
-                        Toast.makeText(getContext(), "Clicked", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
