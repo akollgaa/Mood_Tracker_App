@@ -3,7 +3,6 @@ package com.example.moodtracker;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.icu.text.DateFormat;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -20,7 +19,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -137,7 +135,6 @@ public class TrackerPage extends Fragment {
                 }
                 editor.remove(MOOD_KEY);
                 editor.putStringSet(MOOD_KEY, moodSet);
-                editor.apply();
 
                 // Here we add the explain text to the shared preference through a hashSet
                 if(sharedPreferences.getStringSet(EXPLAIN_KEY,null) == null) {
@@ -145,7 +142,6 @@ public class TrackerPage extends Fragment {
                     explainSet.add(explainText);
                     editor.remove(EXPLAIN_KEY);
                     editor.putStringSet(EXPLAIN_KEY, explainSet);
-                    editor.apply();
                 } else {
                     Set<String> explainSet = sharedPreferences.getStringSet(EXPLAIN_KEY, null);
                     // This checks if the explain text is already saved
@@ -176,9 +172,9 @@ public class TrackerPage extends Fragment {
                         explainSet.add(explainText);
                         editor.remove(EXPLAIN_KEY);
                         editor.putStringSet(EXPLAIN_KEY, explainSet);
-                        editor.apply();
                     }
                 }
+                editor.apply();
                 Toast.makeText(getContext(), "Tracked!", Toast.LENGTH_SHORT).show();
             }
         });

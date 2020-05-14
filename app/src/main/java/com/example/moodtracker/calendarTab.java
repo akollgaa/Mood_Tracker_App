@@ -3,29 +3,21 @@ package com.example.moodtracker;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.media.Image;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.gridlayout.widget.GridLayout;
 
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CalendarView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Hashtable;
 
 
 /**
