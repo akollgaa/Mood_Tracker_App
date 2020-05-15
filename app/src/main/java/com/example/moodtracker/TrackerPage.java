@@ -62,6 +62,88 @@ public class TrackerPage extends Fragment {
         return false;
     }
 
+    private void setMoodPreference() {
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        Date d = new Date();
+        SimpleDateFormat date = new SimpleDateFormat("MM:dd:yyyy");
+
+        // Here we add the mood option to the moodKey
+        Set<String> moodSet;
+        if(sharedPreferences.getStringSet(MOOD_KEY, null) == null) {
+            moodSet = new HashSet<String>();
+            String moodText = date.format(d) + "|" + mMoodOption.getCheckedRadioButtonId();
+            moodSet.add(moodText);
+        } else {
+            moodSet = sharedPreferences.getStringSet(MOOD_KEY, null);
+            String moodText = date.format(d) + "|" + mMoodOption.getCheckedRadioButtonId();
+            for(String text : moodSet) {
+                String word = "";
+                for(int i = 0; i < text.length(); i++) {
+                    if(text.charAt(i) == '|') {
+                        break;
+                    }
+                    word += text.charAt(i);
+                }
+                if(word.equals(date.format(d))) {
+                    moodSet.remove(text);
+                }
+            }
+            moodSet.add(moodText);
+        }
+        editor.remove(MOOD_KEY);
+        editor.putStringSet(MOOD_KEY, moodSet);
+        editor.apply();
+    }
+
+    private void setExplainPreference() {
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Date d = new Date();
+        SimpleDateFormat date = new SimpleDateFormat("MM:dd:yyyy");
+        String explainText = date.format(d) + "|" + mExplainText.getText().toString();
+
+        if(sharedPreferences.getStringSet(EXPLAIN_KEY,null) == null) {
+            Set<String> explainSet = new HashSet<String>();
+            explainSet.add(explainText);
+            editor.remove(EXPLAIN_KEY);
+            editor.putStringSet(EXPLAIN_KEY, explainSet);
+        } else {
+            Set<String> explainSet = sharedPreferences.getStringSet(EXPLAIN_KEY, null);
+            // This checks if the explain text is already saved
+            assert explainSet != null;
+            if(!explainSet.contains(explainText)) {
+                String explainDate = "";
+                // We check again to see if explainSet contains something from today
+                // If so then we delete it and add the new text
+                for(int i = 0; i < explainText.length(); i++) {
+                    if(explainText.charAt(i) == '|') {
+                        break;
+                    }
+                    explainDate += explainText.charAt(i);
+                }
+                for(String text : explainSet) {
+                    String setDate = "";
+                    for(int i = 0; i < text.length(); i++) {
+                        if(text.charAt(i) == '|') {
+                            break;
+                        }
+                        setDate += text.charAt(i);
+                    }
+                    if(setDate.equals(explainDate)) {
+                        explainSet.remove(text);
+                        break;
+                    }
+                }
+                explainSet.add(explainText);
+                editor.remove(EXPLAIN_KEY);
+                editor.putStringSet(EXPLAIN_KEY, explainSet);
+            }
+        }
+        editor.apply();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -92,89 +174,32 @@ public class TrackerPage extends Fragment {
             @Override
             public void onClick(View v) {
                 SharedPreferences sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
 
-                if(mMoodOption.getCheckedRadioButtonId() == -1) {
+                Date d = new Date();
+                SimpleDateFormat s = new SimpleDateFormat("MM:dd:yyyy|");
+                String explainText = mExplainText.getText().toString();
+                int id = mMoodOption.getCheckedRadioButtonId();
+                if(id == -1) {
                     Toast.makeText(getContext(), "Please Select A Mood", Toast.LENGTH_SHORT).show();
-                    Set<String> set = sharedPreferences.getStringSet(MOOD_KEY, null);
-                    if(set != null) {
-                        for(String text : set) {
-                            Log.d("days", text);
-                        }
-                    }
                     return;
                 }
 
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                // = Here we edit the explain text so it can be accessed later through the date.
-                Date d = new Date();
-                SimpleDateFormat date = new SimpleDateFormat("MM:dd:yyyy");
-                String explainText = date.format(d) + "|" + mExplainText.getText().toString();
+                String newMood = s.format(d) + String.valueOf(id) + "|" + explainText;
 
-                // Here we add the mood option to the moodKey
-                Set<String> moodSet;
-                if(sharedPreferences.getStringSet(MOOD_KEY, null) == null) {
-                    moodSet = new HashSet<String>();
-                    String moodText = date.format(d) + "|" + mMoodOption.getCheckedRadioButtonId();
-                    moodSet.add(moodText);
-                } else {
-                    moodSet = sharedPreferences.getStringSet(MOOD_KEY, null);
-                    String moodText = date.format(d) + "|" + mMoodOption.getCheckedRadioButtonId();
-                    for(String text : moodSet) {
-                        String word = "";
-                        for(int i = 0; i < text.length(); i++) {
-                            if(text.charAt(i) == '|') {
-                                break;
-                            }
-                            word += text.charAt(i);
-                        }
-                        if(word.equals(date.format(d))) {
-                            moodSet.remove(text);
-                        }
+                Set<String> moodSet = new HashSet<String>();
+                if(sharedPreferences.getStringSet(MOOD_KEY, null) != null) {
+                    moodSet.addAll(sharedPreferences.getStringSet(MOOD_KEY, null));
+                    if(isTrackedToday()) {
+                        return;
                     }
-                    moodSet.add(moodText);
                 }
-                editor.remove(MOOD_KEY);
+
+                moodSet.add(newMood);
+                editor.clear();
                 editor.putStringSet(MOOD_KEY, moodSet);
-
-                // Here we add the explain text to the shared preference through a hashSet
-                if(sharedPreferences.getStringSet(EXPLAIN_KEY,null) == null) {
-                    Set<String> explainSet = new HashSet<String>();
-                    explainSet.add(explainText);
-                    editor.remove(EXPLAIN_KEY);
-                    editor.putStringSet(EXPLAIN_KEY, explainSet);
-                } else {
-                    Set<String> explainSet = sharedPreferences.getStringSet(EXPLAIN_KEY, null);
-                    // This checks if the explain text is already saved
-                    assert explainSet != null;
-                    if(!explainSet.contains(explainText)) {
-                        String explainDate = "";
-                        // We check again to see if explainSet contains something from today
-                        // If so then we delete it and add the new text
-                        for(int i = 0; i < explainText.length(); i++) {
-                            if(explainText.charAt(i) == '|') {
-                                break;
-                            }
-                            explainDate += explainText.charAt(i);
-                        }
-                        for(String text : explainSet) {
-                            String setDate = "";
-                            for(int i = 0; i < text.length(); i++) {
-                                if(text.charAt(i) == '|') {
-                                    break;
-                                }
-                                setDate += text.charAt(i);
-                            }
-                            if(setDate.equals(explainDate)) {
-                                explainSet.remove(text);
-                                break;
-                            }
-                        }
-                        explainSet.add(explainText);
-                        editor.remove(EXPLAIN_KEY);
-                        editor.putStringSet(EXPLAIN_KEY, explainSet);
-                    }
-                }
                 editor.apply();
+
                 Toast.makeText(getContext(), "Tracked!", Toast.LENGTH_SHORT).show();
             }
         });

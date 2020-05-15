@@ -33,7 +33,7 @@ public class calendarTab extends Fragment {
     private int monthOffSet = 0;
     private int yearOffSet = 0;
     private String currentText;
-    private HashMap<String, String> currentMap;
+    private HashMap<Integer, String> currentMap;
 
     private String DAY_INTENT = "dayIntent";
     private String SHARED_PREFS = "SharedPrefs";
@@ -55,7 +55,7 @@ public class calendarTab extends Fragment {
         forwardArrow = view.findViewById(R.id.fowardArrow);
         calendarView.setColumnCount(7);
         calendarView.setRowCount(5);
-        currentMap = new HashMap<String, String>();
+        currentMap = new HashMap<Integer, String>();
 
 
         backArrow.setOnClickListener(new View.OnClickListener() {
@@ -69,7 +69,6 @@ public class calendarTab extends Fragment {
                 } else {
                     monthOffSet -= 1;
                 }
-                setUpDate(d, s);
                 calendarView.removeAllViews();
                 setUpCalendar();
             }
@@ -86,7 +85,6 @@ public class calendarTab extends Fragment {
                 } else {
                     monthOffSet += 1;
                 }
-                setUpDate(d, s);
                 calendarView.removeAllViews();
                 setUpCalendar();
             }
@@ -134,23 +132,24 @@ public class calendarTab extends Fragment {
         return android.R.color.transparent;
     }
 
-    private int setColor(int day) {
+    private int setColor(int day, int month, int year) {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         if(sharedPreferences.getStringSet(MOOD_KEY, null) != null) {
-            int mMonth, mYear;
-            int mDay;
-            Date d = new Date();
-            SimpleDateFormat sM = new SimpleDateFormat("MM");
-            SimpleDateFormat sY = new SimpleDateFormat("yyyy");
             for(String text : sharedPreferences.getStringSet(MOOD_KEY, null)) {
-                mMonth = Integer.parseInt(text.substring(0, 2));
-                mDay = Integer.parseInt(text.substring(3, 5));
-                mYear = Integer.parseInt(text.substring(6, 10));
-                if(mMonth == (Integer.parseInt(sM.format(d)) + monthOffSet)
-                        && mYear == (Integer.parseInt(sY.format(d)) + yearOffSet)
-                        && mDay == day) {
+                boolean isMonth = Integer.parseInt(text.substring(0, 2)) == month;
+                boolean isYear = Integer.parseInt(text.substring(6, 10)) == year;
+                if(Integer.parseInt(text.substring(3, 5)) == day && isMonth && isYear) {
                     currentText = text;
-                    return findColor(Integer.parseInt(text.substring(11)));
+
+                    text = text.substring(11);
+                    String moodId = "";
+                    for(int i = 0; i < text.length(); i++) {
+                        if(text.charAt(i) == '|') {
+                            break;
+                        }
+                        moodId += text.charAt(i);
+                    }
+                    return findColor(Integer.parseInt(moodId));
                 }
             }
         }
@@ -161,31 +160,36 @@ public class calendarTab extends Fragment {
         Date d = new Date();
         SimpleDateFormat s = new SimpleDateFormat("MM");
         SimpleDateFormat y = new SimpleDateFormat("yyyy");
+        int cMonth = Integer.parseInt(s.format(d)) + monthOffSet;
+        int cYear = Integer.parseInt(y.format(d)) + yearOffSet;
+
+        setUpDate(d, s);
+
         int year = Integer.parseInt(y.format(d)) + yearOffSet;
         int[] daysInMonth = new int[]{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-        setUpDate(d, s);
-        ArrayList<TextView> days = new ArrayList<TextView>();
         int length = daysInMonth[Integer.parseInt(s.format(d))+monthOffSet-1];
         if(length == 28 && (year % 4 == 0)) {
             if(year % 100 == 0 && year % 400 != 0) {
                 length--;
             }
         }
+
+        ArrayList<TextView> days = new ArrayList<TextView>();
         for(int i = 0; i < length; i++) {
             days.add(new TextView(getContext()));
             final String dayNum = "" + (i+1);
             days.get(i).setId(i);
             days.get(i).setText(dayNum);
             days.get(i).setPadding(42, 55, 42, 75);
-            int color = setColor(Integer.parseInt(dayNum));
-            currentMap.put(String.valueOf(days.get(i).getId()), currentText);
+            int color = setColor(Integer.parseInt(dayNum), cMonth, cYear);
+            currentMap.put(days.get(i).getId(), currentText);
             if(color != android.R.color.transparent) {
                 days.get(i).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(getContext(), selectedDate.class);
                         int id = v.getId();
-                        String text = currentMap.get(String.valueOf(id));
+                        String text = currentMap.get(id);
                         intent.putExtra(DAY_INTENT, text);
                         startActivity(intent);
                     }

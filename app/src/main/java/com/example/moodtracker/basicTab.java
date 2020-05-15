@@ -61,28 +61,25 @@ public class basicTab extends Fragment {
     private int[] assignMoodValues() {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
         int[] moodValues = new int[7];
-        Set<String> moodOptions;
-        if(sharedPreferences.getStringSet(MOOD_KEY, null) == null) {
-            moodOptions = new HashSet<String>();
-        } else {
-            moodOptions = sharedPreferences.getStringSet(MOOD_KEY, null);
-        }
-        for(String text : moodOptions) {
-            String option = "";
-            boolean isDate = true;
-            for(int i = 0; i < text.length(); i++) {
-                if(!isDate) {
-                    option += text.charAt(i);
+        if(sharedPreferences.getStringSet(MOOD_KEY, null) != null) {
+            // This iterates over every mood tracked in shared Preferences.
+            for(String text : sharedPreferences.getStringSet(MOOD_KEY, null)) {
+                // Here we find the mood Id which is part of the String in the set.
+                text = text.substring(11);
+                String moodId = "";
+                for(int i = 0; i < text.length(); i++) {
+                    if(text.charAt(i) == '|') {
+                        break;
+                    }
+                    moodId += text.charAt(i);
                 }
-                if(text.charAt(i) == '|') {
-                    isDate = false;
+                // Here we use the id to add it to the array using checkOptions
+                if(checkOptions(moodId) != -1) {
+                    moodValues[checkOptions(moodId)]++;
                 }
             }
-            if(checkOptions(option) == -1) {
-                Toast.makeText(getContext(), "Counting options failed", Toast.LENGTH_SHORT).show();
-            }
-            moodValues[this.checkOptions(option)] = moodValues[this.checkOptions(option)] + 1;
         }
+
         return moodValues;
     }
 
