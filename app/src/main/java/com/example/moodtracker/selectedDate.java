@@ -38,7 +38,7 @@ public class selectedDate extends AppCompatActivity {
         toolBarText.setText(finalDate);
     }
 
-    private String getIdMood(int id) {
+    private String getStringMood(int id) {
         switch (id) {
             case R.id.happy_Option :
                 return "Happy Mood";
@@ -58,49 +58,42 @@ public class selectedDate extends AppCompatActivity {
         return "---- Mood";
     }
 
-    private String getExplainText(String date) {
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        if(sharedPreferences.getStringSet(EXPLAIN_KEY, null) != null) {
-            for(String text : sharedPreferences.getStringSet(EXPLAIN_KEY, null)) {
-                if(date.equals(text.substring(0, 10))) {
-                    return text.substring(11);
-                }
-            }
 
-        }
-        return "Nothing saved.";
-    }
-
-    private void clearCurrentMood() {
+    private void clearCurrentMood(String moodValue) {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        // Here we clear the mood
-        if(sharedPreferences.getStringSet(MOOD_KEY, null) != null) {
-            Set<String> set = new HashSet<String>();
-            set.addAll(sharedPreferences.getStringSet(MOOD_KEY, null));
-            for(String mood : sharedPreferences.getStringSet(MOOD_KEY, null)) {
-                if(mood.substring(0, 11).equals(intent.getStringExtra(DAY_INTENT).substring(0, 11))) {
-                    set.remove(mood);
-                    break;
-                }
+        Set<String> moodSet = new HashSet<String>(sharedPreferences.getStringSet(MOOD_KEY, null));
+        for(String text : moodSet) {
+            if(text.substring(0, 10).equals(moodValue.substring(0, 10))) {
+                moodSet.remove(text);
+                break;
             }
-            editor.putStringSet(MOOD_KEY, set);
-            editor.apply();
         }
+        editor.clear();
+        editor.putStringSet(MOOD_KEY, moodSet);
+        editor.apply();
+    }
 
-        // Here we clear the explain text
-        if(sharedPreferences.getStringSet(EXPLAIN_KEY, null) != null) {
-            Set<String> set = new HashSet<String>();
-            set.addAll(sharedPreferences.getStringSet(EXPLAIN_KEY, null));
-            for(String mood : sharedPreferences.getStringSet(EXPLAIN_KEY, null)) {
-                if(mood.substring(0, 11).equals(intent.getStringExtra(DAY_INTENT).substring(0, 11))) {
-                    set.remove(mood);
-                    break;
-                }
+    private String getExplainText(String text) {
+        int start = 0;
+        for(int i = 0; i < text.length(); i++) {
+            if(text.charAt(i) == '|') {
+                start = i+1;
+                break;
             }
-            editor.putStringSet(EXPLAIN_KEY, set);
-            editor.apply();
         }
+        return text.substring(start);
+    }
+
+    private int getMoodId(String text) {
+        String moodId = "";
+        for(int i = 0; i < text.length(); i++) {
+            if(text.charAt(i) == '|') {
+                break;
+            }
+            moodId += text.charAt(i);
+        }
+        return Integer.parseInt(moodId);
     }
 
     @Override
@@ -117,14 +110,12 @@ public class selectedDate extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        String text = intent.getStringExtra(DAY_INTENT).substring(11);
         // Here we set the mood text
-        String mood = intent.getStringExtra(DAY_INTENT);
-        int id = Integer.parseInt(mood.substring(11));
-        mMood.setText(getIdMood(id));
+        mMood.setText(getStringMood(getMoodId(text)));
 
         // Here we set the text and use the date based from before
-        String date = mood;
-        mExplain.setText(getExplainText(date.substring(0, 10)));
+        mExplain.setText(getExplainText(text));
 
         clearMood.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -135,7 +126,7 @@ public class selectedDate extends AppCompatActivity {
                 alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        clearCurrentMood();
+                        clearCurrentMood(intent.getStringExtra(DAY_INTENT));
                         Toast.makeText(selectedDate.this, "Mood Cleared", Toast.LENGTH_SHORT).show();
                     }
                 });
